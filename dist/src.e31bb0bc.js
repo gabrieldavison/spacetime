@@ -117,20 +117,77 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"index.js":[function(require,module,exports) {
+})({"broadcastChannel.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.bc = void 0;
+var bc = new BroadcastChannel("notes");
+exports.bc = bc;
+console.log("bc go");
+},{}],"index.js":[function(require,module,exports) {
+"use strict";
+
+var _broadcastChannel = require("./broadcastChannel.js");
+
 // Global Variables
 var notes = ["c", "d", "e", "f", "g", "a", "b"];
 var octave = 4;
+var lowOctave = 2;
+var highOctave = 6;
 var note = 0;
-var step = [1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1];
+var step = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 var steps = 16;
 var playPosition = 0;
 var editPosition = 0;
-var tickRate = 500;
+var tickRate = 400;
+var highRate = 400;
+var lowRate = 800;
 var playing = true;
 var actions = [inc, dec, bottom, top, noteRand, metroFast, metroSlow, positionRand];
-var action = ['+', '-', '<', '>', '*', 'M', 'm', '#'];
-var canvas = document.getElementById('canvas');
+var action = ["+", "-", "<", ">", "*", "M", "m", "#"];
+window.addEventListener("keydown", function (e) {
+  return handleKeydown(e);
+});
+
+function handleKeydown(e) {
+  var usedKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Space"];
+
+  if (usedKeys.includes(e.key)) {
+    e.preventDefault();
+  }
+
+  switch (e.key) {
+    case "ArrowLeft":
+      editPosition === 0 ? editPosition = step.length - 1 : editPosition -= 1;
+      draw();
+      break;
+
+    case "ArrowRight":
+      editPosition === step.length - 1 ? editPosition = 0 : editPosition += 1;
+      draw();
+      break;
+
+    case "ArrowUp":
+      step[editPosition] === 7 ? step[editPosition] = 0 : step[editPosition] += 1;
+      draw();
+      break;
+
+    case "ArrowDown":
+      step[editPosition] === 0 ? step[editPosition] = 7 : step[editPosition] -= 1;
+      draw();
+      break;
+
+    case " ":
+      playing = !playing;
+      draw();
+      break;
+  }
+}
+
+var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d"); //creates timer loop
 
 function timer() {
@@ -154,9 +211,8 @@ function timer() {
 timer();
 
 function tick() {
-  console.log(playPosition);
   playPosition == steps - 1 ? playPosition = 0 : playPosition += 1;
-  action[playPosition];
+  actions[step[playPosition]]();
   playNote();
   draw();
 }
@@ -169,7 +225,7 @@ function draw() {
   var y = canvas.height / 2;
 
   for (var i = 0; i < 16; i++) {
-    ctx.font = '40px serif';
+    ctx.font = "40px serif";
     ctx.fillStyle = "black";
 
     if (i === editPosition) {
@@ -180,7 +236,6 @@ function draw() {
 
     if (i === playPosition) {
       var rectangeWidth = ctx.measureText(step[i]).width;
-      console.log(rectangeWidth);
       ctx.beginPath();
       ctx.rect(x, y - (rectangeWidth - 20), rectangeWidth, 3);
       ctx.stroke();
@@ -195,7 +250,7 @@ function draw() {
 function inc() {
   if (note + 1 <= notes.length - 1) {
     note += 1;
-  } else if (note + 1 > notes.length - 1) {
+  } else if (note + 1 > notes.length - 1 && octave < highOctave) {
     octave += 1;
     note = 0;
   }
@@ -203,24 +258,26 @@ function inc() {
 
 
 function dec() {
+  console.log("dec");
+
   if (note - 1 >= 0) {
     note -= 1;
-  } else if (note - 1 < 0) {
+  } else if (note - 1 < 0 && octave > lowOctave) {
     octave -= 1;
-    note = 0;
+    note = notes.length - 1;
   }
 } //Skips to bottom note
 
 
 function bottom() {
   note = 0;
-  octave = 2;
+  octave = lowOctave;
 } //Skips to top note
 
 
 function top() {
   note = notes.length - 1;
-  octave = 5;
+  octave = highOctave;
 } //Skips to random note in current octave
 
 
@@ -229,26 +286,28 @@ function noteRand() {
 }
 
 function metroFast() {
-  time *= 0.5;
+  tickRate = highRate;
 }
 
 function metroSlow() {
-  time *= 2;
+  tickRate = lowRate;
 }
 
 function positionRand() {
-  playPosition = randomIntFromInterval(0, steps.length - 1);
+  playPosition = randomIntFromInterval(0, step.length - 1);
 } //*****UTILS********
 
 
 function playNote() {
   console.log(notes[note] + octave);
+
+  _broadcastChannel.bc.postMessage(notes[note] + octave, "4n");
 }
 
 function randomIntFromInterval(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
-},{}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./broadcastChannel.js":"broadcastChannel.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -276,7 +335,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "40203" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "44013" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
