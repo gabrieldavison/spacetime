@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "codeflask": "^1.4.1",
+    "lodash": "^4.17.20",
     "parcel-bundler": "^1.12.4"
   },
   "devDependencies": {},

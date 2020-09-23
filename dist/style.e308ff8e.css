@@ -1,0 +1,35 @@
+canvas {
+  position: relative;
+}
+
+#configure-modal {
+  width: 1000px;
+  height: 500px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.8;
+}
+
+#error-display {
+  height: 200px;
+}
+#codeflask {
+  height: 350px;
+  width: 350px;
+}
+
+.codeflask {
+  height: 350px !important;
+  width: 350px;
+}
+
+.hidden {
+  display: none;
+}
+.visible {
+  display: block;
+}
+
+
+/*# sourceMappingURL=/style.e308ff8e.css.map */
