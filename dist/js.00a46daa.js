@@ -163,21 +163,17 @@ var SequencerState = /*#__PURE__*/function () {
       this.playPosition = 0;
       this.currentNoteIndex = 0;
       this.currentOctave = this.activeSequencer.octaveLow;
-    } // printConfig() {
-    //   return `
-    //     {
-    //       "notes": "${this.notes}",
-    //       "octaveLow": ${this.octaveLow},
-    //       "octaveHigh": ${this.octaveHigh},
-    //       "speedSlow": ${this.speedSlow},
-    //       "speedFast": ${this.speedFast}
-    //     }
-    //   `;
-    // }
-    // parseConfig(str) {
-    //   console.log(validate(str));
-    // }
-
+    }
+  }, {
+    key: "loadConfig",
+    value: function loadConfig(config) {
+      console.log(config);
+      this.notes = config.notes;
+      this.octaveHigh = config.octaveHigh;
+      this.octaveLow = config.octaveLow;
+      this.speedFast = config.speedFast;
+      this.speedSlow = config.speedSlow;
+    }
   }, {
     key: "activeSequencer",
     get: function get() {
@@ -192,16 +188,25 @@ var SequencerState = /*#__PURE__*/function () {
     key: "notes",
     get: function get() {
       return this.activeSequencer.notes;
+    },
+    set: function set(val) {
+      this.activeSequencer.notes = val;
     }
   }, {
     key: "octaveLow",
     get: function get() {
       return this.activeSequencer.octaveLow;
+    },
+    set: function set(val) {
+      this.activeSequencer.octaveLow = val;
     }
   }, {
     key: "octaveHigh",
     get: function get() {
       return this.activeSequencer.octaveHigh;
+    },
+    set: function set(val) {
+      this.activeSequencer.octaveHigh = val;
     }
   }, {
     key: "pattern",
@@ -217,11 +222,17 @@ var SequencerState = /*#__PURE__*/function () {
     key: "speedFast",
     get: function get() {
       return this.activeSequencer.speedFast;
+    },
+    set: function set(val) {
+      this.activeSequencer.speedFast = val;
     }
   }, {
     key: "speedSlow",
     get: function get() {
       return this.activeSequencer.speedSlow;
+    },
+    set: function set(val) {
+      this.activeSequencer.speedSlow = val;
     }
   }, {
     key: "selectedSequencer",
@@ -434,25 +445,24 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function validate(str) {
-  var errors = []; //checks that str is valid JSON
+function validate(config) {
+  var errors = [];
+  console.log(config); //checks that str is valid JSON
+  // const configObject = JSON.parse(str);
+  // configObject.notes = configObject.notes
+  //   //removes square brackets
+  //   .replace(/[\[\]']+/g, "")
+  //   //removes whitespace
+  //   .replace(/ /g, "")
+  //   .split(",")
+  //   //removes empty strings
+  //   .filter((item) => item !== "");
 
-  try {
-    var configObject = JSON.parse(str);
-    configObject.notes = configObject.notes //removes whitespace
-    .replace(/ /g, "").split(",") //removes empty strings
-    .filter(function (item) {
-      return item !== "";
-    });
-    errors.push.apply(errors, _toConsumableArray(validateNotes(configObject.notes)));
-    errors.push(validateNumber("octaveLow", configObject.octaveLow, 1, 8));
-    errors.push(validateNumber("octaveHigh", configObject.octaveHigh, 1, 8));
-    errors.push(validateNumber("speedSlow", configObject.speedSlow, 50, 2000));
-    errors.push(validateNumber("speedFast", configObject.speedFast, 50, 2000));
-  } catch (err) {
-    errors.push(err.message);
-  }
-
+  errors.push.apply(errors, _toConsumableArray(validateNotes(config.notes)));
+  errors.push(validateNumber("octaveLow", config.octaveLow, 1, 8));
+  errors.push(validateNumber("octaveHigh", config.octaveHigh, 1, 8));
+  errors.push(validateNumber("speedSlow", config.speedSlow, 50, 2000));
+  errors.push(validateNumber("speedFast", config.speedFast, 50, 2000));
   return errors.filter(function (error) {
     return error !== undefined;
   });
@@ -19714,6 +19724,7 @@ var UI = /*#__PURE__*/function () {
     this.heightUnit = this.canvas.height / 10;
     this.textSpacing = (this.canvas.width - this.widthUnit * 2) / 16;
     this.font = "40px serif";
+    this.configErrors = undefined;
   }
 
   _createClass(UI, [{
@@ -19772,7 +19783,7 @@ var UI = /*#__PURE__*/function () {
           this.draw();
           break;
 
-        case "c":
+        case "Escape":
           this.toggleModal();
           break;
       }
@@ -19853,8 +19864,10 @@ var UI = /*#__PURE__*/function () {
   }, {
     key: "toggleModal",
     value: function toggleModal() {
-      this.modal.classList.toggle("hidden");
-      this.modal.classList.toggle("visible");
+      if (this.errorDisplay.childNodes.length === 0) {
+        this.modal.classList.toggle("hidden");
+        this.modal.classList.toggle("visible");
+      }
     }
   }, {
     key: "printConfig",
@@ -19864,7 +19877,20 @@ var UI = /*#__PURE__*/function () {
   }, {
     key: "parseConfig",
     value: function parseConfig(str) {
-      this.displayErrors((0, _validate.validate)(str));
+      try {
+        var dataJSON = JSON.parse(str);
+        dataJSON.notes = dataJSON.notes.split(",");
+        console.log(dataJSON);
+        var errors = (0, _validate.validate)(dataJSON);
+        this.displayErrors(errors);
+
+        if ((0, _lodash.isEmpty)(errors)) {
+          this.sequencerState.loadConfig(dataJSON);
+        }
+      } catch (err) {
+        console.log("parse error");
+        this.displayErrors([err]);
+      }
     }
   }, {
     key: "displayErrors",
@@ -19875,10 +19901,8 @@ var UI = /*#__PURE__*/function () {
         errorHTML = errors.reduce(function (acc, error) {
           return acc + "<li>".concat(error, "</li>");
         }, "");
-      }
-
-      console.log(errorHTML);
-      this.errorDisplay.innerHTML = errorHTML;
+        this.errorDisplay.innerHTML = errorHTML;
+      } else this.errorDisplay.innerHTML = "";
     }
   }]);
 
@@ -20682,11 +20706,14 @@ function tick() {
   sequencerState.playPosition == sequencerState.length - 1 ? sequencerState.playPosition = 0 : sequencerState.playPosition += 1;
   playNote();
   ui.draw();
-} //*****UTILS********
+}
 
+ui.draw(); //*****UTILS********
 
 function playNote() {
-  console.log(sequencerState.currentNote); // bc.postMessage([notes[note] + octave, "4n"]);
+  console.log(sequencerState.currentNote);
+
+  _broadcastChannel.bc.postMessage([sequencerState.currentNote, "4n"]);
 }
 },{"./broadcastChannel.js":"js/broadcastChannel.js","./SequencerState":"js/SequencerState.js","./Sequencer":"js/Sequencer.js","./ActionDispatcher":"js/ActionDispatcher.js","./ui":"js/ui.js","codeflask":"../node_modules/codeflask/build/codeflask.module.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -20716,7 +20743,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45331" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45969" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

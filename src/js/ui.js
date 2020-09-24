@@ -13,6 +13,7 @@ export default class UI {
     this.heightUnit = this.canvas.height / 10;
     this.textSpacing = (this.canvas.width - this.widthUnit * 2) / 16;
     this.font = "40px serif";
+    this.configErrors = undefined;
   }
 
   handleKeydown(e) {
@@ -84,7 +85,7 @@ export default class UI {
         this.sequencerState.selectedSequencer = 4;
         this.draw();
         break;
-      case "c":
+      case "Escape":
         this.toggleModal();
         break;
     }
@@ -156,8 +157,10 @@ export default class UI {
   }
 
   toggleModal() {
-    this.modal.classList.toggle("hidden");
-    this.modal.classList.toggle("visible");
+    if (this.errorDisplay.childNodes.length === 0) {
+      this.modal.classList.toggle("hidden");
+      this.modal.classList.toggle("visible");
+    }
   }
 
   printConfig() {
@@ -173,7 +176,19 @@ export default class UI {
   }
 
   parseConfig(str) {
-    this.displayErrors(validate(str));
+    try {
+      const dataJSON = JSON.parse(str);
+      dataJSON.notes = dataJSON.notes.split(",");
+      console.log(dataJSON);
+      const errors = validate(dataJSON);
+      this.displayErrors(errors);
+      if (isEmpty(errors)) {
+        this.sequencerState.loadConfig(dataJSON);
+      }
+    } catch (err) {
+      console.log("parse error");
+      this.displayErrors([err]);
+    }
   }
 
   displayErrors(errors) {
@@ -182,8 +197,7 @@ export default class UI {
       errorHTML = errors.reduce((acc, error) => {
         return acc + `<li>${error}</li>`;
       }, "");
-    }
-    console.log(errorHTML);
-    this.errorDisplay.innerHTML = errorHTML;
+      this.errorDisplay.innerHTML = errorHTML;
+    } else this.errorDisplay.innerHTML = "";
   }
 }

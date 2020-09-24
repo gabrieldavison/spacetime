@@ -78,9 +78,11 @@ function tick() {
   ui.draw();
 }
 
+ui.draw();
+
 //*****UTILS********
 
 function playNote() {
   console.log(sequencerState.currentNote);
-  // bc.postMessage([notes[note] + octave, "4n"]);
+  bc.postMessage([sequencerState.currentNote, "4n"]);
 }

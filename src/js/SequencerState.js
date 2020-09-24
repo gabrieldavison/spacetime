@@ -28,25 +28,45 @@ export default class SequencerState {
   get notes() {
     return this.activeSequencer.notes;
   }
+  set notes(val) {
+    this.activeSequencer.notes = val;
+  }
 
   get octaveLow() {
     return this.activeSequencer.octaveLow;
   }
+  set octaveLow(val) {
+    this.activeSequencer.octaveLow = val;
+  }
+
   get octaveHigh() {
     return this.activeSequencer.octaveHigh;
   }
+  set octaveHigh(val) {
+    this.activeSequencer.octaveHigh = val;
+  }
+
   get pattern() {
     return this.activeSequencer.pattern;
   }
   get length() {
     return this.activeSequencer.length;
   }
+
   get speedFast() {
     return this.activeSequencer.speedFast;
   }
+  set speedFast(val) {
+    this.activeSequencer.speedFast = val;
+  }
+
   get speedSlow() {
     return this.activeSequencer.speedSlow;
   }
+  set speedSlow(val) {
+    this.activeSequencer.speedSlow = val;
+  }
+
   get selectedSequencer() {
     return this._selectedSequencer;
   }
@@ -62,19 +82,12 @@ export default class SequencerState {
     this.currentOctave = this.activeSequencer.octaveLow;
   }
 
-  // printConfig() {
-  //   return `
-  //     {
-  //       "notes": "${this.notes}",
-  //       "octaveLow": ${this.octaveLow},
-  //       "octaveHigh": ${this.octaveHigh},
-  //       "speedSlow": ${this.speedSlow},
-  //       "speedFast": ${this.speedFast}
-  //     }
-  //   `;
-  // }
-
-  // parseConfig(str) {
-  //   console.log(validate(str));
-  // }
+  loadConfig(config) {
+    console.log(config);
+    this.notes = config.notes;
+    this.octaveHigh = config.octaveHigh;
+    this.octaveLow = config.octaveLow;
+    this.speedFast = config.speedFast;
+    this.speedSlow = config.speedSlow;
+  }
 }
