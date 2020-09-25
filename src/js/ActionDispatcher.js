@@ -40,6 +40,12 @@ export default class ActionDispatcher {
       case 7:
         this.positionRand();
         break;
+      case 8:
+        console.log("skip");
+        break;
+      case 9:
+        this.playCurrent();
+        break;
     }
   }
 
@@ -58,6 +64,7 @@ export default class ActionDispatcher {
       this.sequencerState.currentOctave += 1;
       this.sequencerState.currentNoteIndex = 0;
     }
+    this.sequencerState.playNote();
   }
 
   //Decrements note
@@ -72,18 +79,21 @@ export default class ActionDispatcher {
       this.sequencerState.currentNoteIndex =
         this.sequencerState.notes.length - 1;
     }
+    this.sequencerState.playNote();
   }
 
   //Skips to bottom note
   bottom() {
     this.sequencerState.currentNoteIndex = 0;
     this.sequencerState.currentOctave = this.sequencerState.octaveLow;
+    this.sequencerState.playNote();
   }
 
   //Skips to top note
   top() {
     this.sequencerState.currentNoteIndex = this.sequencerState.notes.length - 1;
     this.sequencerState.currentOctave = this.sequencerState.octaveHigh;
+    this.sequencerState.playNote();
   }
 
   //Skips to random note in current octave
@@ -92,14 +102,17 @@ export default class ActionDispatcher {
       0,
       this.sequencerState.notes.length - 1
     );
+    this.sequencerState.playNote();
   }
 
   speedFast() {
     this.sequencerState.currentSpeed = this.sequencerState.speedFast;
+    this.sequencerState.playNote();
   }
 
   speedSlow() {
     this.sequencerState.currentSpeed = this.sequencerState.speedSlow;
+    this.sequencerState.playNote();
   }
 
   positionRand() {
@@ -107,6 +120,11 @@ export default class ActionDispatcher {
       0,
       this.sequencerState.pattern.length - 1
     );
+    this.sequencerState.playNote();
+  }
+
+  playCurrent() {
+    this.sequencerState.playNote();
   }
 }
 // export { inc, dec, bottom, top, noteRand, metroFast, metroSlow, positionRand };

@@ -28,12 +28,15 @@ const sequencer1 = new Sequencer({});
 const sequencer2 = new Sequencer({});
 const sequencer3 = new Sequencer({});
 const sequencer4 = new Sequencer({});
-const sequencerState = new SequencerState({
-  1: sequencer1,
-  2: sequencer2,
-  3: sequencer3,
-  4: sequencer4,
-});
+const sequencerState = new SequencerState(
+  {
+    1: sequencer1,
+    2: sequencer2,
+    3: sequencer3,
+    4: sequencer4,
+  },
+  playNote
+);
 
 const actionDispatcher = new ActionDispatcher(sequencerState);
 
@@ -74,7 +77,6 @@ function tick() {
     ? (sequencerState.playPosition = 0)
     : (sequencerState.playPosition += 1);
 
-  playNote();
   ui.draw();
 }
 

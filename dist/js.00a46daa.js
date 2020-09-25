@@ -142,7 +142,7 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var SequencerState = /*#__PURE__*/function () {
-  function SequencerState(sequencers) {
+  function SequencerState(sequencers, playNote) {
     _classCallCheck(this, SequencerState);
 
     // Object containing sequencers
@@ -155,6 +155,7 @@ var SequencerState = /*#__PURE__*/function () {
     this.currentOctave = this.activeSequencer.octaveLow;
     this.currentSpeed = this.activeSequencer.speedFast;
     this.playing = false;
+    this.playNote = playNote;
   }
 
   _createClass(SequencerState, [{
@@ -359,6 +360,14 @@ var ActionDispatcher = /*#__PURE__*/function () {
         case 7:
           this.positionRand();
           break;
+
+        case 8:
+          console.log("skip");
+          break;
+
+        case 9:
+          this.playCurrent();
+          break;
       }
     } //Increments note
 
@@ -371,6 +380,8 @@ var ActionDispatcher = /*#__PURE__*/function () {
         this.sequencerState.currentOctave += 1;
         this.sequencerState.currentNoteIndex = 0;
       }
+
+      this.sequencerState.playNote();
     } //Decrements note
 
   }, {
@@ -382,6 +393,8 @@ var ActionDispatcher = /*#__PURE__*/function () {
         this.sequencerState.currentOctave -= 1;
         this.sequencerState.currentNoteIndex = this.sequencerState.notes.length - 1;
       }
+
+      this.sequencerState.playNote();
     } //Skips to bottom note
 
   }, {
@@ -389,6 +402,7 @@ var ActionDispatcher = /*#__PURE__*/function () {
     value: function bottom() {
       this.sequencerState.currentNoteIndex = 0;
       this.sequencerState.currentOctave = this.sequencerState.octaveLow;
+      this.sequencerState.playNote();
     } //Skips to top note
 
   }, {
@@ -396,27 +410,37 @@ var ActionDispatcher = /*#__PURE__*/function () {
     value: function top() {
       this.sequencerState.currentNoteIndex = this.sequencerState.notes.length - 1;
       this.sequencerState.currentOctave = this.sequencerState.octaveHigh;
+      this.sequencerState.playNote();
     } //Skips to random note in current octave
 
   }, {
     key: "noteRand",
     value: function noteRand() {
       this.sequencerState.currentNoteIndex = (0, _randomIntFromInterval.default)(0, this.sequencerState.notes.length - 1);
+      this.sequencerState.playNote();
     }
   }, {
     key: "speedFast",
     value: function speedFast() {
       this.sequencerState.currentSpeed = this.sequencerState.speedFast;
+      this.sequencerState.playNote();
     }
   }, {
     key: "speedSlow",
     value: function speedSlow() {
       this.sequencerState.currentSpeed = this.sequencerState.speedSlow;
+      this.sequencerState.playNote();
     }
   }, {
     key: "positionRand",
     value: function positionRand() {
       this.sequencerState.playPosition = (0, _randomIntFromInterval.default)(0, this.sequencerState.pattern.length - 1);
+      this.sequencerState.playNote();
+    }
+  }, {
+    key: "playCurrent",
+    value: function playCurrent() {
+      this.sequencerState.playNote();
     }
   }]);
 
@@ -19719,7 +19743,7 @@ var UI = /*#__PURE__*/function () {
     this.ctx = this.canvas.getContext("2d");
     this.modal = document.getElementById("configure-modal");
     this.errorDisplay = document.getElementById("error-display");
-    this.action = ["+", "-", "<", ">", "*", "f", "s", "#"];
+    this.action = ["+", "-", "<", ">", "*", "f", "s", "#", "_", "="];
     this.widthUnit = this.canvas.width / 10;
     this.heightUnit = this.canvas.height / 10;
     this.textSpacing = (this.canvas.width - this.widthUnit * 2) / 16;
@@ -19748,12 +19772,12 @@ var UI = /*#__PURE__*/function () {
           break;
 
         case "ArrowUp":
-          this.sequencerState.pattern[this.sequencerState.editPosition] === 7 ? this.sequencerState.pattern[this.sequencerState.editPosition] = 0 : this.sequencerState.pattern[this.sequencerState.editPosition] += 1;
+          this.sequencerState.pattern[this.sequencerState.editPosition] === this.action.length - 1 ? this.sequencerState.pattern[this.sequencerState.editPosition] = 0 : this.sequencerState.pattern[this.sequencerState.editPosition] += 1;
           this.draw();
           break;
 
         case "ArrowDown":
-          this.sequencerState.pattern[this.sequencerState.editPosition] === 0 ? this.sequencerState.pattern[this.sequencerState.editPosition] = 7 : this.sequencerState.pattern[this.sequencerState.editPosition] -= 1;
+          this.sequencerState.pattern[this.sequencerState.editPosition] === 0 ? this.sequencerState.pattern[this.sequencerState.editPosition] = this.action.length - 1 : this.sequencerState.pattern[this.sequencerState.editPosition] -= 1;
           this.draw();
           break;
 
@@ -20664,7 +20688,7 @@ var sequencerState = new _SequencerState.default({
   2: sequencer2,
   3: sequencer3,
   4: sequencer4
-});
+}, playNote);
 var actionDispatcher = new _ActionDispatcher.default(sequencerState); // Create UI object
 
 var ui = new _ui.default(sequencerState);
@@ -20704,7 +20728,6 @@ timer();
 function tick() {
   actionDispatcher.dispatch(sequencerState.pattern[sequencerState.playPosition]);
   sequencerState.playPosition == sequencerState.length - 1 ? sequencerState.playPosition = 0 : sequencerState.playPosition += 1;
-  playNote();
   ui.draw();
 }
 
@@ -20743,7 +20766,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45969" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38027" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

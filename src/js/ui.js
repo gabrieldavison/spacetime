@@ -8,7 +8,7 @@ export default class UI {
     this.ctx = this.canvas.getContext("2d");
     this.modal = document.getElementById("configure-modal");
     this.errorDisplay = document.getElementById("error-display");
-    this.action = ["+", "-", "<", ">", "*", "f", "s", "#"];
+    this.action = ["+", "-", "<", ">", "*", "f", "s", "#", "_", "="];
     this.widthUnit = this.canvas.width / 10;
     this.heightUnit = this.canvas.height / 10;
     this.textSpacing = (this.canvas.width - this.widthUnit * 2) / 16;
@@ -49,7 +49,8 @@ export default class UI {
         this.draw();
         break;
       case "ArrowUp":
-        this.sequencerState.pattern[this.sequencerState.editPosition] === 7
+        this.sequencerState.pattern[this.sequencerState.editPosition] ===
+        this.action.length - 1
           ? (this.sequencerState.pattern[this.sequencerState.editPosition] = 0)
           : (this.sequencerState.pattern[
               this.sequencerState.editPosition
@@ -58,7 +59,8 @@ export default class UI {
         break;
       case "ArrowDown":
         this.sequencerState.pattern[this.sequencerState.editPosition] === 0
-          ? (this.sequencerState.pattern[this.sequencerState.editPosition] = 7)
+          ? (this.sequencerState.pattern[this.sequencerState.editPosition] =
+              this.action.length - 1)
           : (this.sequencerState.pattern[
               this.sequencerState.editPosition
             ] -= 1);

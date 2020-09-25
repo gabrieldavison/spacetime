@@ -1,5 +1,5 @@
 export default class SequencerState {
-  constructor(sequencers) {
+  constructor(sequencers, playNote) {
     // Object containing sequencers
     this.sequencers = sequencers;
     // Key for selected sequencer
@@ -13,6 +13,7 @@ export default class SequencerState {
 
     this.currentSpeed = this.activeSequencer.speedFast;
     this.playing = false;
+    this.playNote = playNote;
   }
 
   get activeSequencer() {
