@@ -90,5 +90,6 @@ export default class SequencerState {
     this.octaveLow = config.octaveLow;
     this.speedFast = config.speedFast;
     this.speedSlow = config.speedSlow;
+    this.currentNoteIndex = 0;
   }
 }

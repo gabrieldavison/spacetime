@@ -174,6 +174,7 @@ var SequencerState = /*#__PURE__*/function () {
       this.octaveLow = config.octaveLow;
       this.speedFast = config.speedFast;
       this.speedSlow = config.speedSlow;
+      this.currentNoteIndex = 0;
     }
   }, {
     key: "activeSequencer",
@@ -19742,6 +19743,7 @@ var UI = /*#__PURE__*/function () {
     this.canvas = document.getElementById("canvas");
     this.ctx = this.canvas.getContext("2d");
     this.modal = document.getElementById("configure-modal");
+    this.modalVisible = false;
     this.errorDisplay = document.getElementById("error-display");
     this.action = ["+", "-", "<", ">", "*", "f", "s", "#", "_", "="];
     this.widthUnit = this.canvas.width / 10;
@@ -19754,62 +19756,62 @@ var UI = /*#__PURE__*/function () {
   _createClass(UI, [{
     key: "handleKeydown",
     value: function handleKeydown(e) {
-      var usedKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Space", "1", "2", "3", "4", "c"];
+      var usedKeys = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " ", "1", "2", "3", "4", "c"];
 
-      if (usedKeys.includes(e.key)) {
+      if (usedKeys.includes(e.key) && this.modalVisible === false) {
         e.preventDefault();
+
+        switch (e.key) {
+          case "ArrowLeft":
+            this.sequencerState.editPosition === 0 ? this.sequencerState.editPosition = this.sequencerState.pattern.length - 1 : this.sequencerState.editPosition -= 1;
+            this.draw();
+            break;
+
+          case "ArrowRight":
+            this.sequencerState.editPosition === this.sequencerState.pattern.length - 1 ? this.sequencerState.editPosition = 0 : this.sequencerState.editPosition += 1;
+            this.draw();
+            break;
+
+          case "ArrowUp":
+            this.sequencerState.pattern[this.sequencerState.editPosition] === this.action.length - 1 ? this.sequencerState.pattern[this.sequencerState.editPosition] = 0 : this.sequencerState.pattern[this.sequencerState.editPosition] += 1;
+            this.draw();
+            break;
+
+          case "ArrowDown":
+            this.sequencerState.pattern[this.sequencerState.editPosition] === 0 ? this.sequencerState.pattern[this.sequencerState.editPosition] = this.action.length - 1 : this.sequencerState.pattern[this.sequencerState.editPosition] -= 1;
+            this.draw();
+            break;
+
+          case " ":
+            this.sequencerState.playing = !this.sequencerState.playing;
+            this.draw();
+            break;
+
+          case "1":
+            this.sequencerState.selectedSequencer = 1;
+            this.draw();
+            console.log("1");
+            break;
+
+          case "2":
+            this.sequencerState.selectedSequencer = 2;
+            this.draw();
+            break;
+
+          case "3":
+            this.sequencerState.selectedSequencer = 3;
+            this.draw();
+            break;
+
+          case "4":
+            this.sequencerState.selectedSequencer = 4;
+            this.draw();
+            break;
+        }
       }
 
-      switch (e.key) {
-        case "ArrowLeft":
-          this.sequencerState.editPosition === 0 ? this.sequencerState.editPosition = this.sequencerState.pattern.length - 1 : this.sequencerState.editPosition -= 1;
-          this.draw();
-          break;
-
-        case "ArrowRight":
-          this.sequencerState.editPosition === this.sequencerState.pattern.length - 1 ? this.sequencerState.editPosition = 0 : this.sequencerState.editPosition += 1;
-          this.draw();
-          break;
-
-        case "ArrowUp":
-          this.sequencerState.pattern[this.sequencerState.editPosition] === this.action.length - 1 ? this.sequencerState.pattern[this.sequencerState.editPosition] = 0 : this.sequencerState.pattern[this.sequencerState.editPosition] += 1;
-          this.draw();
-          break;
-
-        case "ArrowDown":
-          this.sequencerState.pattern[this.sequencerState.editPosition] === 0 ? this.sequencerState.pattern[this.sequencerState.editPosition] = this.action.length - 1 : this.sequencerState.pattern[this.sequencerState.editPosition] -= 1;
-          this.draw();
-          break;
-
-        case " ":
-          this.sequencerState.playing = !this.sequencerState.playing;
-          this.draw();
-          break;
-
-        case "1":
-          this.sequencerState.selectedSequencer = 1;
-          this.draw();
-          console.log("1");
-          break;
-
-        case "2":
-          this.sequencerState.selectedSequencer = 2;
-          this.draw();
-          break;
-
-        case "3":
-          this.sequencerState.selectedSequencer = 3;
-          this.draw();
-          break;
-
-        case "4":
-          this.sequencerState.selectedSequencer = 4;
-          this.draw();
-          break;
-
-        case "Escape":
-          this.toggleModal();
-          break;
+      if (e.key === "Escape") {
+        this.toggleModal();
       }
     }
   }, {
@@ -19888,10 +19890,13 @@ var UI = /*#__PURE__*/function () {
   }, {
     key: "toggleModal",
     value: function toggleModal() {
+      // Checks for errors before toggling modal off
       if (this.errorDisplay.childNodes.length === 0) {
         this.modal.classList.toggle("hidden");
         this.modal.classList.toggle("visible");
       }
+
+      this.modalVisible = !this.modalVisible;
     }
   }, {
     key: "printConfig",
@@ -20766,7 +20771,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "38027" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "32885" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

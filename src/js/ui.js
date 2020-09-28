@@ -7,6 +7,7 @@ export default class UI {
     this.canvas = document.getElementById("canvas");
     this.ctx = this.canvas.getContext("2d");
     this.modal = document.getElementById("configure-modal");
+    this.modalVisible = false;
     this.errorDisplay = document.getElementById("error-display");
     this.action = ["+", "-", "<", ">", "*", "f", "s", "#", "_", "="];
     this.widthUnit = this.canvas.width / 10;
@@ -22,74 +23,75 @@ export default class UI {
       "ArrowRight",
       "ArrowUp",
       "ArrowDown",
-      "Space",
+      " ",
       "1",
       "2",
       "3",
       "4",
       "c",
     ];
-    if (usedKeys.includes(e.key)) {
+    if (usedKeys.includes(e.key) && this.modalVisible === false) {
       e.preventDefault();
+      switch (e.key) {
+        case "ArrowLeft":
+          this.sequencerState.editPosition === 0
+            ? (this.sequencerState.editPosition =
+                this.sequencerState.pattern.length - 1)
+            : (this.sequencerState.editPosition -= 1);
+          this.draw();
+          break;
+        case "ArrowRight":
+          this.sequencerState.editPosition ===
+          this.sequencerState.pattern.length - 1
+            ? (this.sequencerState.editPosition = 0)
+            : (this.sequencerState.editPosition += 1);
+          this.draw();
+          break;
+        case "ArrowUp":
+          this.sequencerState.pattern[this.sequencerState.editPosition] ===
+          this.action.length - 1
+            ? (this.sequencerState.pattern[
+                this.sequencerState.editPosition
+              ] = 0)
+            : (this.sequencerState.pattern[
+                this.sequencerState.editPosition
+              ] += 1);
+          this.draw();
+          break;
+        case "ArrowDown":
+          this.sequencerState.pattern[this.sequencerState.editPosition] === 0
+            ? (this.sequencerState.pattern[this.sequencerState.editPosition] =
+                this.action.length - 1)
+            : (this.sequencerState.pattern[
+                this.sequencerState.editPosition
+              ] -= 1);
+          this.draw();
+          break;
+        case " ":
+          this.sequencerState.playing = !this.sequencerState.playing;
+          this.draw();
+          break;
+        case "1":
+          this.sequencerState.selectedSequencer = 1;
+          this.draw();
+          console.log("1");
+          break;
+        case "2":
+          this.sequencerState.selectedSequencer = 2;
+          this.draw();
+          break;
+        case "3":
+          this.sequencerState.selectedSequencer = 3;
+          this.draw();
+          break;
+        case "4":
+          this.sequencerState.selectedSequencer = 4;
+          this.draw();
+          break;
+      }
     }
-
-    switch (e.key) {
-      case "ArrowLeft":
-        this.sequencerState.editPosition === 0
-          ? (this.sequencerState.editPosition =
-              this.sequencerState.pattern.length - 1)
-          : (this.sequencerState.editPosition -= 1);
-        this.draw();
-        break;
-      case "ArrowRight":
-        this.sequencerState.editPosition ===
-        this.sequencerState.pattern.length - 1
-          ? (this.sequencerState.editPosition = 0)
-          : (this.sequencerState.editPosition += 1);
-        this.draw();
-        break;
-      case "ArrowUp":
-        this.sequencerState.pattern[this.sequencerState.editPosition] ===
-        this.action.length - 1
-          ? (this.sequencerState.pattern[this.sequencerState.editPosition] = 0)
-          : (this.sequencerState.pattern[
-              this.sequencerState.editPosition
-            ] += 1);
-        this.draw();
-        break;
-      case "ArrowDown":
-        this.sequencerState.pattern[this.sequencerState.editPosition] === 0
-          ? (this.sequencerState.pattern[this.sequencerState.editPosition] =
-              this.action.length - 1)
-          : (this.sequencerState.pattern[
-              this.sequencerState.editPosition
-            ] -= 1);
-        this.draw();
-        break;
-      case " ":
-        this.sequencerState.playing = !this.sequencerState.playing;
-        this.draw();
-        break;
-      case "1":
-        this.sequencerState.selectedSequencer = 1;
-        this.draw();
-        console.log("1");
-        break;
-      case "2":
-        this.sequencerState.selectedSequencer = 2;
-        this.draw();
-        break;
-      case "3":
-        this.sequencerState.selectedSequencer = 3;
-        this.draw();
-        break;
-      case "4":
-        this.sequencerState.selectedSequencer = 4;
-        this.draw();
-        break;
-      case "Escape":
-        this.toggleModal();
-        break;
+    if (e.key === "Escape") {
+      this.toggleModal();
     }
   }
 
@@ -159,10 +161,12 @@ export default class UI {
   }
 
   toggleModal() {
+    // Checks for errors before toggling modal off
     if (this.errorDisplay.childNodes.length === 0) {
       this.modal.classList.toggle("hidden");
       this.modal.classList.toggle("visible");
     }
+    this.modalVisible = !this.modalVisible;
   }
 
   printConfig() {
