@@ -4,25 +4,21 @@ import Sequencer from "./Sequencer";
 import ActionDispatcher from "./ActionDispatcher";
 import UI from "./ui";
 import CodeFlask from "codeflask";
+import SynthEngine from "./engine/sound";
+import UIController from "./engine/ui";
+import * as Tone from "tone";
 
-// Global Variables
+document
+  .getElementById("help-button")
+  .addEventListener("click", toggleHelpModal);
+document
+  .getElementById("close-modal-button")
+  .addEventListener("click", toggleHelpModal);
+const helpModal = document.getElementById("help-modal");
 
-// let notes = ["c", "eb", "f", "g", "ab"];
-// let octave = 4;
-// const lowOctave = 4;
-// const highOctave = 5;
-// let note = 0;
-// let step = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-// let steps = 16;
-// let playPosition = 0;
-// let editPosition = 0;
-// let tickRate = 200;
-// let highRate = 200;
-// let lowRate = 600;
-// let playing = true;
-
-//********************** */
-
+function toggleHelpModal() {
+  helpModal.classList.toggle("hidden");
+}
 //Creates Sequencer and state container
 const sequencer1 = new Sequencer({});
 const sequencer2 = new Sequencer({});
@@ -81,10 +77,37 @@ function tick() {
 }
 
 ui.draw();
+//****************** Engine ********************* */
+
+const startAudio = document.getElementById("start-sound");
+startAudio.addEventListener("click", async () => {
+  await Tone.start();
+  console.log("audio is ready");
+});
+
+const synth = new SynthEngine(4);
+const synthUI = new UIController(synth);
+
+//Event listener for toggles
+const synthSliders = document.querySelectorAll(".slider");
+synthSliders.forEach((slider) => {
+  slider.addEventListener("input", (e) => {
+    synthUI.setValue(e.target.id, e.target.value);
+  });
+});
+
+//Event listener for toggles
+const synthToggles = document.querySelectorAll(".toggle");
+synthToggles.forEach((toggle) => {
+  toggle.addEventListener("change", (e) => {
+    synthUI.toggleValue(e.target.id, e.target.value);
+  });
+});
 
 //*****UTILS********
 
 function playNote() {
   console.log(sequencerState.currentNote);
   bc.postMessage([sequencerState.currentNote, "4n"]);
+  synth.triggerAttackRelease(sequencerState.currentNote, "4n");
 }

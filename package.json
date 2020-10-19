@@ -6,12 +6,13 @@
   "dependencies": {
     "codeflask": "^1.4.1",
     "lodash": "^4.17.20",
-    "parcel-bundler": "^1.12.4"
+    "parcel-bundler": "^1.12.4",
+    "tone": "^14.7.58"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel src/index.html"
+    "start": "parcel src/index.html ./src/assets/**/*"
   },
   "repository": {
     "type": "git",
@@ -22,5 +23,6 @@
   "bugs": {
     "url": "https://github.com/gabrieldavison/spacetime/issues"
   },
+  "browserslist": "last 2 chrome versions",
   "homepage": "https://github.com/gabrieldavison/spacetime#readme"
 }

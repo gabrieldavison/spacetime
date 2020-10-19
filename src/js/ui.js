@@ -1,5 +1,6 @@
 import { validate } from "./utils/validate";
 import { isEmpty } from "lodash";
+import { colors } from "./colors";
 
 export default class UI {
   constructor(sequencerState) {
@@ -13,7 +14,7 @@ export default class UI {
     this.widthUnit = this.canvas.width / 10;
     this.heightUnit = this.canvas.height / 10;
     this.textSpacing = (this.canvas.width - this.widthUnit * 2) / 16;
-    this.font = "40px serif";
+    this.font = "30px IBM Plex Mono";
     this.configErrors = undefined;
   }
 
@@ -109,22 +110,22 @@ export default class UI {
 
   drawSequencer() {
     let x = this.widthUnit;
-    const y = this.canvas.height / 2;
+    const y = this.canvas.height / 1.5;
 
     for (let i = 0; i < 16; i++) {
       this.ctx.font = this.font;
-      this.ctx.fillStyle = "black";
+      this.ctx.fillStyle = colors.dark;
       if (i === this.sequencerState.editPosition) {
-        this.ctx.fillStyle = "red";
+        this.ctx.fillStyle = colors.accent;
       }
       this.ctx.fillText(this.action[this.sequencerState.pattern[i]], x, y);
+      // Draws playhead
       if (i === this.sequencerState.playPosition) {
         const rectangleWidth = this.ctx.measureText(
           this.sequencerState.pattern[i]
         ).width;
-        this.ctx.beginPath();
-        this.ctx.rect(x, y - (rectangleWidth - 20), rectangleWidth, 3);
-        this.ctx.stroke();
+        this.ctx.fillStyle = colors.dark;
+        this.ctx.fillRect(x, y - (rectangleWidth - 30), rectangleWidth, 3);
       }
 
       x += this.textSpacing;
@@ -135,9 +136,9 @@ export default class UI {
     let x = this.widthUnit;
     let y = this.heightUnit * 2;
     for (let i = 1; i <= 4; i++) {
-      this.ctx.fillStyle = "black";
+      this.ctx.fillStyle = colors.dark;
       if (i === this.sequencerState.selectedSequencer) {
-        this.ctx.fillStyle = "red";
+        this.ctx.fillStyle = colors.accent;
       }
       this.ctx.fillText(i, x, y);
       x += this.textSpacing;
@@ -146,15 +147,15 @@ export default class UI {
 
   drawCurrentNote() {
     let x = this.widthUnit;
-    let y = this.heightUnit * 3;
-    this.ctx.fillStyle = "black";
+    let y = this.heightUnit * 3.5;
+    this.ctx.fillStyle = colors.dark;
     this.ctx.fillText(this.sequencerState.currentNote, x, y);
   }
 
   drawPlaying() {
-    let x = this.widthUnit;
-    let y = this.heightUnit * 4;
-    this.ctx.fillStyle = "black";
+    let x = this.widthUnit - 4;
+    let y = this.heightUnit * 5;
+    this.ctx.fillStyle = colors.dark;
     this.sequencerState.playing
       ? this.ctx.fillText("►", x, y)
       : this.ctx.fillText("⏸", x, y);
@@ -165,6 +166,7 @@ export default class UI {
     if (this.errorDisplay.childNodes.length === 0) {
       this.modal.classList.toggle("hidden");
       this.modal.classList.toggle("visible");
+      this.canvas.classList.toggle("dimmed");
     }
     this.modalVisible = !this.modalVisible;
   }
