@@ -1,5 +1,7 @@
 ![SpacetimeJS](./docs/README-images/spacetime-logo.png)
 
+## [LIVE DEMO](https://gabrieldavison.github.io/spacetimeJS/)
+
 This project is derived from [a study](https://monome.org/docs/norns/study-3/) originally written in lua for the [monome norns](https://monome.org/docs/norns/). This implementation is written in Javascript and uses my synthesizer project [Engine](https://github.com/gabrieldavison/engine) to generate the sounds.
 
 ## The Sequencer
