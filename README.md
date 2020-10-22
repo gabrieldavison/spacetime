@@ -29,9 +29,9 @@ Use the left/right arrows to move the edit position on the sequencer and the up/
 
 Pressing \<escape> will display the configuration screen for the selected sequencer. This is a text file that can edited to change certain variables.
 
-### Sequencer Variables:
-
 ![config screenshot](./docs/README-images/sequencer-config.png)
+
+### Sequencer Variables:
 
 - "notes": notes of the scale
 - "octaveLow": lowest octave the sequencer will play
