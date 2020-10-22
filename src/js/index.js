@@ -33,6 +33,10 @@ const sequencerState = new SequencerState(
   },
   playNote
 );
+function playNote() {
+  bc.postMessage([sequencerState.currentNote, "4n"]);
+  synth.triggerAttackRelease(sequencerState.currentNote, "4n");
+}
 
 const actionDispatcher = new ActionDispatcher(sequencerState);
 
@@ -77,6 +81,7 @@ function tick() {
 }
 
 ui.draw();
+
 //****************** Engine ********************* */
 
 const startAudio = document.getElementById("start-sound");
@@ -103,11 +108,3 @@ synthToggles.forEach((toggle) => {
     synthUI.toggleValue(e.target.id, e.target.value);
   });
 });
-
-//*****UTILS********
-
-function playNote() {
-  console.log(sequencerState.currentNote);
-  bc.postMessage([sequencerState.currentNote, "4n"]);
-  synth.triggerAttackRelease(sequencerState.currentNote, "4n");
-}

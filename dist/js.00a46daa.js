@@ -71507,6 +71507,13 @@ const sequencerState = new _SequencerState.default({
   3: sequencer3,
   4: sequencer4
 }, playNote);
+
+function playNote() {
+  _broadcastChannel.bc.postMessage([sequencerState.currentNote, "4n"]);
+
+  synth.triggerAttackRelease(sequencerState.currentNote, "4n");
+}
+
 const actionDispatcher = new _ActionDispatcher.default(sequencerState); // Create UI object
 
 const ui = new _ui.default(sequencerState);
@@ -71569,15 +71576,7 @@ synthToggles.forEach(toggle => {
   toggle.addEventListener("change", e => {
     synthUI.toggleValue(e.target.id, e.target.value);
   });
-}); //*****UTILS********
-
-function playNote() {
-  console.log(sequencerState.currentNote);
-
-  _broadcastChannel.bc.postMessage([sequencerState.currentNote, "4n"]);
-
-  synth.triggerAttackRelease(sequencerState.currentNote, "4n");
-}
+});
 },{"./broadcastChannel.js":"js/broadcastChannel.js","./SequencerState":"js/SequencerState.js","./Sequencer":"js/Sequencer.js","./ActionDispatcher":"js/ActionDispatcher.js","./ui":"js/ui.js","codeflask":"../node_modules/codeflask/build/codeflask.module.js","./engine/sound":"js/engine/sound.js","./engine/ui":"js/engine/ui.js","tone":"../node_modules/tone/build/esm/index.js"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -71606,7 +71605,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34819" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "36407" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
