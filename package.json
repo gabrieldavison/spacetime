@@ -12,7 +12,8 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "parcel src/index.html ./src/assets/**/*"
+    "start": "parcel src/index.html ./src/assets/**/*",
+    "build": "parcel build ./src/index.html ./src/assets/**/* -d ./docs --public-url /spacetimeJS"
   },
   "repository": {
     "type": "git",
